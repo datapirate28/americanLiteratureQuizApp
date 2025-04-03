@@ -1,3 +1,38 @@
+// Analytics tracking functions
+function trackQuizStart(studentName, questionCount) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'quiz_start', {
+            'event_category': 'Quiz',
+            'event_label': 'Started',
+            'student_name': studentName,
+            'question_count': questionCount
+        });
+    }
+}
+
+function trackQuizCompletion(studentName, score, totalQuestions) {
+    if (typeof gtag !== 'undefined') {
+        const percentage = Math.round((score / totalQuestions) * 100);
+        gtag('event', 'quiz_completion', {
+            'event_category': 'Quiz',
+            'event_label': 'Completed',
+            'student_name': studentName,
+            'score': score,
+            'total_questions': totalQuestions,
+            'percentage': percentage
+        });
+    }
+}
+
+function trackUnitView(unitName) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'unit_view', {
+            'event_category': 'Study Guide',
+            'event_label': unitName
+        });
+    }
+}
+
 let selectedQuestionCount = "all"; // Default to "all" questions
 
 // Header scroll behavior
@@ -3090,41 +3125,6 @@ const unitFourQuestions = [
         correct: 2
       }
 ];
-
-// Analytics tracking functions
-function trackQuizStart(studentName, questionCount) {
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'quiz_start', {
-            'event_category': 'Quiz',
-            'event_label': 'Started',
-            'student_name': studentName,
-            'question_count': questionCount
-        });
-    }
-}
-
-function trackQuizCompletion(studentName, score, totalQuestions) {
-    if (typeof gtag !== 'undefined') {
-        const percentage = Math.round((score / totalQuestions) * 100);
-        gtag('event', 'quiz_completion', {
-            'event_category': 'Quiz',
-            'event_label': 'Completed',
-            'student_name': studentName,
-            'score': score,
-            'total_questions': totalQuestions,
-            'percentage': percentage
-        });
-    }
-}
-
-function trackUnitView(unitName) {
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'unit_view', {
-            'event_category': 'Study Guide',
-            'event_label': unitName
-        });
-    }
-}
 
 
 
