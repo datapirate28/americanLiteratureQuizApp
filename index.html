@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Quiz App</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- App Styles -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'MEASUREMENT_ID'); // You'll replace MEASUREMENT_ID with your actual GA ID
+    </script>
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app-container">
+        <!-- Logo -->
+        <header class="logo">
+            <h1>American Literature - <a href="https://edebiyat.cumhuriyet.edu.tr/bolumler/311100172-ingiliz-dili-ve-edebiyati-bolumu">SCÜ24</a></h1>
+        </header>
+
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <div class="home-content">
+                <h1 class="home-title">Welcome Aboard</h1>
+                <div class="home-description">
+                    <p>
+                        If you're aiming for a score of 90–100 on the final English Cultural History exam, you've come to the right place. I created this app out of sheer dedication to mastering English history, born from countless hours of meticulous study and preparation.                    <p style="margin-top: 15px;">
+                        After achieving an impressive score on the last midterm exam, I realized that an app like this could not only enhance my own results but also help others reach their highest potential.                    </p>
+                    <p style="margin-top: 15px;">
+                        Now, I'm sharing it with you and my classmates, so we can all excel together and make the final exam a triumph.                    </p>
+                </div>
+                <div class="author-info">
+                    <img id="author-image" src="2.jpg" alt="Hashmatullah Naybi" class="author-image">
+                    <p>
+                        This app is created and designed by <a href="https://www.instagram.com/hnaybi28/" target="_blank">Hashmatullah Naybi</a> & <a href="https://www.linkedin.com/in/s%C4%B1la-topalo%C4%9Flu-11aa7b308/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">Sıla Topaloğlu</a>, as a tribute to the third class year, 2025.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Study Guide Section -->
+        <div id="study-guide" class="section">
+            <div class="study-guide" id="study-guide-content">
+                <!-- Questions will be populated here -->
+                <h2>Study Guide</h2>
+                <p class="section-description">Here are the questions and their correct answers for your review:</p>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="section">
+            <!-- Student Info Form -->
+            <div id="student-form" class="quiz-container">
+                <h2>Start Your Quiz</h2>
+                <div class="form-group">
+                    <label for="firstName"><i class="fas fa-user"></i> First Name</label>
+                    <input type="text" id="firstName" placeholder="Enter your first name" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName"><i class="fas fa-user"></i> Last Name</label>
+                    <input type="text" id="lastName" placeholder="Enter your last name" required>
+                </div>
+                <div class="form-group">
+                    <label for="questionCount">Number of Questions</label>
+                    <select id="questionCount" name="questionCount" class="form-control">
+                        <option value="10">10 Questions</option>
+                        <option value="20">20 Questions</option>
+                        <option value="40" selected>40 Questions</option>
+                        <option value="60">60 Questions</option>
+                        <option value="100">100 Questions</option>
+                        <option value="all">All Questions</option>
+                    </select>
+                </div>
+                <button class="btn pulse-animation" onclick="startQuiz()">
+                    <i class="fas fa-play-circle"></i> Start Quiz
+                </button>
+            </div>
+
+            <!-- Quiz Content (Initially Hidden) -->
+            <div id="quiz-content" class="quiz-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <div class="question-card">
+                    <div id="questionNumber" class="question-number"></div>
+                    <div id="questionText" class="question-text"></div>
+                    <div id="options" class="options-container"></div>
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display: none;">
+                        <i class="fas fa-arrow-right"></i> Next Question
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Container (Added for completeness) -->
+            <div id="results" class="quiz-container results-container" style="display: none;">
+                <h2>Quiz Results</h2>
+                <div id="score" class="score-display">0/0</div>
+                <div id="resultMessage" class="result-message">You've completed the quiz!</div>
+                <button class="btn try-again-btn" onclick="tryAgain()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <section id="notes" class="section">
+            <div class="notes-section">
+                <h1 class="notes-title">Book of Notes</h1>
+                
+                <div class="book-container">
+                    <div class="book-slider">
+                        <div class="slider-container">
+                            <div class="slide">
+                                <img src="/images/bookCover.jpg" alt="Book Cover">
+                            </div>
+                            <div class="slide">
+                                <img src="/images/2.jpg" alt="Book Page 1">
+                            </div>
+                            <div class="slide">
+                                <img src="/images/3.jpg" alt="Book Page 2">
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation buttons -->
+                        <button class="slider-button prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="slider-button next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        
+                        <!-- Dots navigation -->
+                        <div class="slider-nav">
+                            <!-- Dots will be added dynamically via JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="download-section">
+                        <p class="download-text">You can download the book through just by clicking on the link below</p>
+                        <a href="American Literature - First 3 Units.pdf" class="download-link" download>
+                            Download Book
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <nav class="navbar">
+            <a href="#" class="nav-link active" onclick="showSection('home')">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('notes')">
+                <i class="fas fa-book-open"></i>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('study-guide')">
+                <i class="fas fa-book"></i>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('quiz')">
+                <i class="fas fa-clipboard-list"></i>
+            </a>
+        </nav>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+    // Book slider functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const sliderContainer = document.querySelector('.slider-container');
+        const slides = document.querySelectorAll('.slide');
+        const prevButton = document.querySelector('.slider-button.prev');
+        const nextButton = document.querySelector('.slider-button.next');
+        const sliderNav = document.querySelector('.slider-nav');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        // Create dots
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('slider-dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            sliderNav.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.slider-dot');
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            sliderContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        // Touch events for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        sliderContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        sliderContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        }
+
+        // Button events
+        prevButton.addEventListener('click', prevSlide);
+        nextButton.addEventListener('click', nextSlide);
+    });
+    </script>
+</body>
+</html>
