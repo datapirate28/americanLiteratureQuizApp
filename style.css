@@ -906,8 +906,8 @@ body {
 /* Media queries for quiz section on various screens */
 @media screen and (max-width: 480px) and (min-height: 650px) {
     .quiz-container {
-        width: 90%;
-        max-width: 90%;
+        width: 100%;
+        max-width: 100%;
         top: 0;
         transform: none;
         margin-top: 20px;
