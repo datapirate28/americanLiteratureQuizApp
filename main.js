@@ -2256,15 +2256,14 @@ function initializeSlider() {
     const totalSlides = slides.length;
     let autoSlideInterval;
     let isTransitioning = false;
-    const transitionDuration = 200; // Reduced to 200ms for faster transitions
-    const autoSlideDuration = 700; // 0.7 seconds between slides
-    const resumeDelay = 2000; // 2 seconds pause after manual interaction
-
-    // Clear existing dots and setup
-    sliderNav.innerHTML = '';
-    sliderContainer.style.transition = `transform ${transitionDuration}ms ease-in-out`;
-
+    const transitionDuration = 300; // Smooth transition duration
+    const autoSlideDuration = 1500; // 1.50 seconds between slides
+    const resumeDelay = 3000; // 3 seconds pause after manual interaction
+    
     // Create dots
+    sliderNav.innerHTML = '';
+    sliderContainer.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+    
     slides.forEach((_, index) => {
         const dot = document.createElement('div');
         dot.classList.add('slider-dot');
@@ -2277,18 +2276,19 @@ function initializeSlider() {
         });
         sliderNav.appendChild(dot);
     });
-
+    
     const dots = document.querySelectorAll('.slider-dot');
-
+    
     function updateDots() {
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === currentSlide);
         });
     }
-
+    
     function goToSlide(index) {
         if (isTransitioning) return;
         isTransitioning = true;
+        
         currentSlide = index;
         sliderContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
         updateDots();
@@ -2298,42 +2298,55 @@ function initializeSlider() {
             isTransitioning = false;
         }, transitionDuration);
     }
-
+    
     function nextSlide() {
         if (!isTransitioning) {
-            goToSlide((currentSlide + 1) % totalSlides);
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
         }
     }
-
+    
     function prevSlide() {
         if (!isTransitioning) {
-            goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            goToSlide(currentSlide);
         }
     }
-
+    
     function startAutoSlide() {
         stopAutoSlide(); // Clear any existing interval
         autoSlideInterval = setInterval(nextSlide, autoSlideDuration);
     }
-
+    
     function stopAutoSlide() {
         clearInterval(autoSlideInterval);
     }
-
+    
     function resetAutoSlide() {
         stopAutoSlide();
         setTimeout(startAutoSlide, resumeDelay);
     }
-
-    // Touch handling with improved sensitivity
+    
+    // Button events
+    prevButton.addEventListener('click', () => {
+        prevSlide();
+        resetAutoSlide();
+    });
+    
+    nextButton.addEventListener('click', () => {
+        nextSlide();
+        resetAutoSlide();
+    });
+    
+    // Touch events for mobile
     let touchStartX = 0;
-    let touchStartTime = 0;
+    let touchEndX = 0;
     let isSwiping = false;
-
+    let diff = 0;
+    
     sliderContainer.addEventListener('touchstart', e => {
         if (!isTransitioning) {
-            touchStartX = e.touches[0].clientX;
-            touchStartTime = Date.now();
+            touchStartX = e.changedTouches[0].screenX;
             isSwiping = true;
             stopAutoSlide();
             
@@ -2341,86 +2354,45 @@ function initializeSlider() {
             sliderContainer.style.transition = 'none';
         }
     });
-
+    
     sliderContainer.addEventListener('touchmove', e => {
         if (isSwiping && !isTransitioning) {
-            const diff = touchStartX - e.touches[0].clientX;
+            diff = e.changedTouches[0].screenX - touchStartX;
             const offset = -(currentSlide * 100 + (diff / sliderContainer.offsetWidth) * 100);
             sliderContainer.style.transform = `translateX(${offset}%)`;
         }
     });
-
+    
     sliderContainer.addEventListener('touchend', e => {
         if (!isSwiping) return;
         
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndTime = Date.now();
-        const timeDiff = touchEndTime - touchStartTime;
-        const diff = touchStartX - touchEndX;
+        touchEndX = e.changedTouches[0].screenX;
+        isSwiping = false;
         
         // Restore transition
-        sliderContainer.style.transition = `transform ${transitionDuration}ms ease-in-out`;
+        sliderContainer.style.transition = `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
         
-        // Calculate swipe speed and distance
-        const swipeSpeed = Math.abs(diff) / timeDiff;
-        const swipeThreshold = sliderContainer.offsetWidth * 0.2; // 20% of container width
+        handleSwipe();
+        resetAutoSlide();
+    });
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
         
-        if (Math.abs(diff) > swipeThreshold || swipeSpeed > 0.5) {
+        if (Math.abs(diff) > swipeThreshold) {
             if (diff > 0) {
                 nextSlide();
             } else {
                 prevSlide();
             }
         } else {
-            // Return to current slide if swipe wasn't strong enough
+            // If swipe wasn't strong enough, return to current slide
             goToSlide(currentSlide);
         }
-        
-        isSwiping = false;
-        resetAutoSlide();
-    });
-
-    // Button events with visual feedback
-    [prevButton, nextButton].forEach(button => {
-        button.addEventListener('click', () => {
-            if (!isTransitioning) {
-                button === prevButton ? prevSlide() : nextSlide();
-                button.style.transform = 'scale(0.95)';
-                setTimeout(() => button.style.transform = '', 200);
-                resetAutoSlide();
-            }
-        });
-    });
-
-    // Mouse hover events
-    sliderContainer.addEventListener('mouseenter', () => {
-        stopAutoSlide();
-        // Show navigation buttons more prominently
-        prevButton.style.opacity = '1';
-        nextButton.style.opacity = '1';
-    });
-
-    sliderContainer.addEventListener('mouseleave', () => {
-        startAutoSlide();
-        // Return buttons to default opacity
-        prevButton.style.opacity = '0.7';
-        nextButton.style.opacity = '0.7';
-    });
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (document.getElementById('notes').classList.contains('active')) {
-            if (e.key === 'ArrowLeft') {
-                prevSlide();
-                resetAutoSlide();
-            } else if (e.key === 'ArrowRight') {
-                nextSlide();
-                resetAutoSlide();
-            }
-        }
-    });
-
-    // Initialize
+    }
+    
+    // Start auto-sliding
     startAutoSlide();
 }
 
