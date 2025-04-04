@@ -867,6 +867,8 @@ body {
     
     .quiz-container {
         padding: 15px;
+        width: 100%;
+        max-width: 100%;
     }
     
     .form-group {
@@ -932,6 +934,8 @@ body {
 
 @media screen and (max-height: 600px) {
     .quiz-container {
+        width: 100%;
+        max-width: 100%;
         padding: 15px;
         margin-top: 0;
     }
