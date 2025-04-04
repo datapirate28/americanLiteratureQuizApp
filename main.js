@@ -2735,7 +2735,7 @@ function showResults() {
     if (percentage >= 90) {
         resultMessage.innerHTML = `
             <span style="color: var(--success-color);">Outstanding!</span> 
-            You're mastering English Cultural History!
+            You're mastering American Literature History!
             ${scoreBreakdown}
         `;
         scoreDisplay.style.color = 'var(--success-color)';
