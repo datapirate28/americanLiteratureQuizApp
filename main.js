@@ -2779,6 +2779,12 @@ function tryAgain() {
     // Hide results
     document.getElementById('results').style.display = 'none';
     
+    // Remove any existing Show Results button
+    const showResultsBtn = document.querySelector('.try-again-btn');
+    if (showResultsBtn) {
+        showResultsBtn.remove();
+    }
+    
     // Show student form
     document.getElementById('student-form').style.display = 'block';
     document.getElementById('quiz-content').style.display = 'none';
