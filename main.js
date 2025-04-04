@@ -24,20 +24,7 @@ function trackQuizCompletion(studentName, score, totalQuestions) {
             'percentage': percentage,
             'correct_answers': score,
             'incorrect_answers': incorrectAnswers,
-            'timestamp': new Date().toISOString()
-        });
-    }
-}
-
-// Also track individual question responses
-function trackQuestionResponse(studentName, questionNumber, isCorrect) {
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'question_response', {
-            'event_category': 'Quiz',
-            'event_label': isCorrect ? 'Correct' : 'Incorrect',
-            'student_name': studentName,
-            'question_number': questionNumber,
-            'is_correct': isCorrect
+            'accuracy_rate': `${percentage}%`
         });
     }
 }
@@ -2208,36 +2195,53 @@ let studentLastName = '';
 
 // Navigation Functions
 function showSection(sectionId) {
-    // Track section views
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'section_view', {
-            'event_category': 'Navigation',
-            'event_label': sectionId
-        });
-    }
-
     // Hide all sections
-    document.querySelectorAll('.section').forEach(section => {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
         section.classList.remove('active');
     });
     
-    // Show selected section
-    document.getElementById(sectionId).classList.add('active');
+    // Show the selected section
+    const selectedSection = document.getElementById(sectionId);
+    if (selectedSection) {
+        selectedSection.classList.add('active');
+        // Reset scroll position when changing sections
+        selectedSection.scrollTop = 0;
+    }
+
+    // Always show header when changing sections
+    const header = document.querySelector('.logo');
+    header.classList.remove('hide');
+    lastScrollPosition = 0;
     
-    // Update navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
+    // Update active navigation link
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
         link.classList.remove('active');
     });
     
-    // Find and activate the corresponding nav link
-    const activeNavLink = Array.from(document.querySelectorAll('.nav-link')).find(link => 
-        link.getAttribute('onclick').includes(sectionId)
-    );
-    if (activeNavLink) activeNavLink.classList.add('active');
+    // Find the link that called this function and mark it as active
+    const activeLink = document.querySelector(`.nav-link[onclick*="${sectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
     
-    // Reset header state
-    lastScrollPosition = 0;
-    header.classList.remove('hide');
+    // If showing study guide, ensure it's populated
+    if (sectionId === 'study-guide') {
+        populateStudyGuide();
+    }
+
+    // Initialize slider if navigating to notes section
+    if (sectionId === 'notes') {
+        initializeSlider();
+    }
+    
+    // Reset quiz section when navigating away
+    if (sectionId !== 'quiz' && document.getElementById('quiz-content').style.display === 'block') {
+        document.getElementById('quiz-content').style.display = 'none';
+        document.getElementById('student-form').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+    }
 }
 
 // Slider functionality
@@ -2483,11 +2487,11 @@ function showUnitQuestions(unit) {
             break;
         case 'three':
             questions = unitThreeQuestions;
-            unitTitle = "Unit Three: American Renaissance";
+            unitTitle = "Unit Three: The Romantic Period";
             break;
         case 'four':
             questions = unitFourQuestions;
-            unitTitle = "Redline Questions";
+            unitTitle = "Essential Questions";
             break;
         default:
             questions = unitOneQuestions;
@@ -2496,6 +2500,14 @@ function showUnitQuestions(unit) {
     
     // Track unit view
     trackUnitView(unitTitle);
+    
+    if (!questions || questions.length === 0) {
+        unitContent.innerHTML = `
+            <h3 class="unit-title">${unitTitle}</h3>
+            <p class="unit-description">No questions available for this unit yet.</p>
+        `;
+        return;
+    }
     
     // Create header content
     const header = `
@@ -2656,14 +2668,6 @@ function selectOption(selectedIndex) {
     // Mark as answered
     answered = true;
     
-    // Track this question response
-    const isCorrect = selectedIndex === currentQuestion.correct;
-    trackQuestionResponse(
-        `${studentFirstName} ${studentLastName}`,
-        currentQuestionIndex + 1,
-        isCorrect
-    );
-    
     // Highlight correct and wrong answers
     optionsElements.forEach((option, index) => {
         option.classList.remove('selected');
@@ -2683,7 +2687,7 @@ function selectOption(selectedIndex) {
     });
     
     // Update score if correct
-    if (isCorrect) {
+    if (selectedIndex === currentQuestion.correct) {
         score++;
     }
     
@@ -2719,37 +2723,77 @@ function showResults() {
     const resultsContainer = document.getElementById('results');
     resultsContainer.style.display = 'block';
     
-    // Update score
-    const scoreDisplay = document.getElementById('score');
-    scoreDisplay.textContent = `${score}/${currentQuestions.length}`;
+    // Calculate scores
+    const totalQuestions = currentQuestions.length;
+    const incorrectAnswers = totalQuestions - score;
+    const percentage = Math.round((score / totalQuestions) * 100);
     
-    // Track quiz completion
+    // Update score display
+    const scoreDisplay = document.getElementById('score');
+    scoreDisplay.textContent = `${score}/${totalQuestions}`;
+    
+    // Track quiz completion with detailed metrics
     trackQuizCompletion(
         `${studentFirstName} ${studentLastName}`,
         score,
-        currentQuestions.length
+        totalQuestions
     );
     
-    // Calculate percentage
-    const percentage = Math.round((score / currentQuestions.length) * 100);
+    // Create detailed score breakdown
+    const scoreBreakdown = `
+        <div class="score-details">
+            <div class="score-item correct">
+                <i class="fas fa-check-circle"></i>
+                <span>Correct: ${score}</span>
+            </div>
+            <div class="score-item incorrect">
+                <i class="fas fa-times-circle"></i>
+                <span>Incorrect: ${incorrectAnswers}</span>
+            </div>
+            <div class="score-item percentage">
+                <i class="fas fa-percentage"></i>
+                <span>Accuracy: ${percentage}%</span>
+            </div>
+        </div>
+    `;
     
     // Update result message based on score
     const resultMessage = document.getElementById('resultMessage');
     
     if (percentage >= 90) {
-        resultMessage.innerHTML = `<span style="color: var(--success-color);">Outstanding!</span> You're mastering English Cultural History!`;
+        resultMessage.innerHTML = `
+            <span style="color: var(--success-color);">Outstanding!</span> 
+            You're mastering English Cultural History!
+            ${scoreBreakdown}
+        `;
         scoreDisplay.style.color = 'var(--success-color)';
     } else if (percentage >= 80) {
-        resultMessage.innerHTML = `<span style="color: var(--success-color);">Great job!</span> You have a strong grasp of the material.`;
+        resultMessage.innerHTML = `
+            <span style="color: var(--success-color);">Great job!</span> 
+            You have a strong grasp of the material.
+            ${scoreBreakdown}
+        `;
         scoreDisplay.style.color = 'var(--success-color)';
     } else if (percentage >= 70) {
-        resultMessage.innerHTML = `<span style="color: var(--primary-color);">Good work!</span> You're on the right track.`;
+        resultMessage.innerHTML = `
+            <span style="color: var(--primary-color);">Good work!</span> 
+            You're on the right track.
+            ${scoreBreakdown}
+        `;
         scoreDisplay.style.color = 'var(--primary-color)';
     } else if (percentage >= 60) {
-        resultMessage.innerHTML = `<span style="color: var(--primary-color);">Not bad!</span> A bit more study and you'll improve.`;
+        resultMessage.innerHTML = `
+            <span style="color: var(--primary-color);">Not bad!</span> 
+            A bit more study and you'll improve.
+            ${scoreBreakdown}
+        `;
         scoreDisplay.style.color = 'var(--primary-color)';
     } else {
-        resultMessage.innerHTML = `<span style="color: var(--error-color);">Keep studying!</span> Review the material and try again.`;
+        resultMessage.innerHTML = `
+            <span style="color: var(--error-color);">Keep studying!</span> 
+            Review the material and try again.
+            ${scoreBreakdown}
+        `;
         scoreDisplay.style.color = 'var(--error-color)';
     }
 }
