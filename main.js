@@ -2735,35 +2735,35 @@ function showResults() {
     if (percentage >= 90) {
         resultMessage.innerHTML = `
             <span style="color: var(--success-color);">Outstanding!</span> 
-            You're mastering American Literature History!
+            You're totally crushing American Literature History—seriously, you could lecture Ralph Waldo Emerson on his own books and he'd take notes!
             ${scoreBreakdown}
         `;
         scoreDisplay.style.color = 'var(--success-color)';
     } else if (percentage >= 80) {
         resultMessage.innerHTML = `
             <span style="color: var(--success-color);">Great job!</span> 
-            You have a strong grasp of the material.
+            You're absolutely nailing it! With a grasp like yours, Emerson would call you a sage, and Melville would probably name a ship after you!
             ${scoreBreakdown}
         `;
         scoreDisplay.style.color = 'var(--success-color)';
     } else if (percentage >= 70) {
         resultMessage.innerHTML = `
             <span style="color: var(--primary-color);">Good work!</span> 
-            You're on the right track.
+            You're nailing it—Franklin would applaud, and Whitman would cheer! A solid B, my friend!
             ${scoreBreakdown}
         `;
         scoreDisplay.style.color = 'var(--primary-color)';
     } else if (percentage >= 60) {
         resultMessage.innerHTML = `
             <span style="color: var(--primary-color);">Not bad!</span> 
-            A bit more study and you'll improve.
+            With a little more focus, Hawthorne might have called you his star student!
             ${scoreBreakdown}
         `;
         scoreDisplay.style.color = 'var(--primary-color)';
     } else {
         resultMessage.innerHTML = `
             <span style="color: var(--error-color);">Keep studying!</span> 
-            Review the material and try again.
+            No worries—take another swing at it! Even Emerson would say every step is part of your journey toward greatness!
             ${scoreBreakdown}
         `;
         scoreDisplay.style.color = 'var(--error-color)';
